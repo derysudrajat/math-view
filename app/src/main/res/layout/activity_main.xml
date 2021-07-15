@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mathsample.MainActivity">
+    tools:context="io.github.derysudrajat.mathsample.MainActivity">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilInputMath"
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tilInputMath" />
 
-    <com.derysudrajat.mathview.MathView
+    <io.github.derysudrajat.mathview.MathView
         android:id="@+id/mathView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
