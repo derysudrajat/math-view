@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MathView</string>
+    <string name="formula">Formula</string>
+    <string name="render">Render</string>
+</resources>
