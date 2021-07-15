@@ -3,16 +3,22 @@ plugins {
     id 'kotlin-android'
 }
 
+ext.majorVersion = 0
+ext.minorVersion = 1
+ext.patchVersion = 1
+ext.preRelease = "dev"
+ext.minSdkVersion = 21
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.derysudrajat.mathsample"
-        minSdkVersion 21
+        applicationId "io.github.derysudrajat.mathsample"
+        minSdkVersion project.ext.minSdkVersion
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        versionCode generateVersionCode()
+        versionName generateVersionName()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +39,16 @@ android {
     buildFeatures {
         viewBinding true
     }
+}
+
+private Integer generateVersionCode() {
+    return ext.minSdkVersion * 10000000 + ext.majorVersion * 10000 + ext.minorVersion * 100 + ext.patchVersion
+}
+
+private String generateVersionName() {
+    String versionName = "${ext.majorVersion}.${ext.minorVersion}.${ext.patchVersion}"
+    if (ext.preRelease != null && !ext.preRelease.isEmpty()) versionName = versionName + "-" + ext.preRelease
+    return versionName
 }
 
 dependencies {
