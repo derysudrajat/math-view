@@ -15,11 +15,12 @@ class MainActivity : AppCompatActivity() {
 
         with(binding) {
             val baseText = "2a+4b\\sqrt{\\frac{4x-2^{6}}{ax^2+57}}+\\frac{3}{2}"
-            mathView.setFormula(baseText)
+            mathView.formula = baseText
+
             edtInputMath.setText(baseText)
             btnRender.setOnClickListener {
                 val text = edtInputMath.text.toString()
-                if (text.isNotBlank()) mathView.setFormula(text)
+                if (text.isNotBlank()) mathView.formula = text
             }
         }
     }

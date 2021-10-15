@@ -3,20 +3,20 @@ plugins {
     id 'kotlin-android'
 }
 
-ext.majorVersion = 0
-ext.minorVersion = 1
+ext.majorVersion = 1
+ext.minorVersion = 0
 ext.patchVersion = 1
 ext.preRelease = "dev"
 ext.minSdkVersion = 21
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "io.github.derysudrajat.mathsample"
         minSdkVersion project.ext.minSdkVersion
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode generateVersionCode()
         versionName generateVersionName()
 
@@ -55,9 +55,9 @@ dependencies {
     implementation project(":mathview")
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
