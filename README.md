@@ -2,7 +2,7 @@
 # math-view
 A Library for displaying math equation in Android
 
-
+[![](https://jitpack.io/v/derysudrajat/math-view.svg)](https://jitpack.io/#derysudrajat/math-view)
 
 ## Setup
 
