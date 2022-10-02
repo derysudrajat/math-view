@@ -30,10 +30,23 @@ class MathView : WebView {
             loadFormula(value)
         }
 
+    var loadFromMathJax: Boolean = false
+        set(value) {
+            field = value
+            loadFormula(formula)
+        }
+
+    private var textColor: String = ""
+
     private fun loadFormula(value: String) {
         val data = BASE_URL + encode(if (isDarkMode()) "\\color{white}{$value}" else value)
         Log.d(TAG, "setFormula: $data")
-        loadData(getData(data), "text/html; charset=utf-8", "UTF-8")
+
+        loadData(
+            if (loadFromMathJax) getDataFromMatJax(value) else getData(data),
+            "text/html; charset=utf-8",
+            "UTF-8"
+        )
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -44,6 +57,8 @@ class MathView : WebView {
         formula = ""
         mContext = context
         pageLoaded = false
+        loadFromMathJax = false
+        textColor = if (isDarkMode()) "white" else "black"
 
         this.settings.javaScriptEnabled = true
         this.settings.useWideViewPort = true
@@ -69,6 +84,28 @@ class MathView : WebView {
                 "</body>\n" +
                 "</html>"
     }
+
+    /**
+     * @param value formula to be rendered
+     * @return html data to be rendered
+     */
+    private fun getDataFromMatJax(value: String) = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+    </head>
+    <body>
+    <h2
+        style= "color: $textColor;">
+        $$${"\\huge $value"}$$
+    </h2>
+    </body>
+    </html>""".trimIndent()
+
 
     companion object {
         private val TAG = MathView::class.java.simpleName

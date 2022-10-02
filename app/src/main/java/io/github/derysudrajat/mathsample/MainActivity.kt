@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
             edtInputMath.setText(baseText)
             btnRender.setOnClickListener {
                 val text = edtInputMath.text.toString()
+                mathView.loadFromMathJax = binding.switchButton.isChecked
                 if (text.isNotBlank()) mathView.formula = text
             }
         }
