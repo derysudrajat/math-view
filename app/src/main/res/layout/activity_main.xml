@@ -24,17 +24,25 @@
             android:hint="@string/formula" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/switchButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/mathjax"
+        app:layout_constraintEnd_toEndOf="@+id/tilInputMath"
+        app:layout_constraintTop_toBottomOf="@+id/tilInputMath" />
+
     <Button
         android:id="@+id/btnRender"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
         android:text="@string/render"
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tilInputMath" />
+        app:layout_constraintTop_toBottomOf="@+id/switchButton" />
 
     <io.github.derysudrajat.mathview.MathView
         android:id="@+id/mathView"
