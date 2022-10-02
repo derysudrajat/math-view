@@ -3,10 +3,12 @@ package io.github.derysudrajat.mathview
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.webkit.WebView
+import androidx.annotation.ColorRes
 import io.github.derysudrajat.mathview.Helpers.isDarkMode
 
 
@@ -36,14 +38,15 @@ class MathView : WebView {
             loadFormula(formula)
         }
 
-    private var textColor: String = ""
+    private var textColor: RGB? = null
 
     private fun loadFormula(value: String) {
         val data = BASE_URL + encode(if (isDarkMode()) "\\color{white}{$value}" else value)
         Log.d(TAG, "setFormula: $data")
 
+        val newData = if (loadFromMathJax) getDataFromMatJax(value) else getData(data)
         loadData(
-            if (loadFromMathJax) getDataFromMatJax(value) else getData(data),
+            newData,
             "text/html; charset=utf-8",
             "UTF-8"
         )
@@ -58,7 +61,7 @@ class MathView : WebView {
         mContext = context
         pageLoaded = false
         loadFromMathJax = false
-        textColor = if (isDarkMode()) "white" else "black"
+        textColor = if (isDarkMode()) RGB.WHITE else RGB.BLACK
 
         this.settings.javaScriptEnabled = true
         this.settings.useWideViewPort = true
@@ -85,6 +88,7 @@ class MathView : WebView {
                 "</html>"
     }
 
+
     /**
      * @param value formula to be rendered
      * @return html data to be rendered
@@ -99,13 +103,45 @@ class MathView : WebView {
     </script>
     </head>
     <body>
-    <h2
-        style= "color: $textColor;">
-        $$${"\\huge $value"}$$
-    </h2>
+        <h2
+            style= "color: ${textColor.toString()}">
+            $$${"\\huge $value"}$$
+        </h2>
     </body>
     </html>""".trimIndent()
 
+
+    fun setTextColor(@ColorRes colorInt: Int) {
+        val nothing: Int? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mContext?.getColor(colorInt);
+            } else {
+                mContext?.resources?.getColor(colorInt);
+            }
+        if (nothing == null) return
+        val hexColor = String.format("#%06X", (0xFFFFFF and nothing))
+        setTextColor(hexColor)
+    }
+
+    fun setTextColor(hexColor: String) {
+        val color = hexColor.removePrefix("#")
+        val r = color.substring(0, 2).toInt(16) // 16 for hex
+        val g = color.substring(2, 4).toInt(16) // 16 for hex
+        val b = color.substring(4, 6).toInt(16) // 16 for hex
+        setTextColor(RGB(r, g, b)) // Webview doesn't handle colors in hex format well. it is necessary to convert to RGB
+    }
+
+    fun setTextColor(rgb: RGB) {
+        textColor = rgb
+    }
+
+    data class RGB(val r: Int, val g: Int, val b: Int) {
+        companion object {
+            val WHITE = RGB(255,255,255)
+            val BLACK = RGB(0,0,0)
+        }
+        override fun toString(): String = "rgb($r, $g, $b)"
+    }
 
     companion object {
         private val TAG = MathView::class.java.simpleName
