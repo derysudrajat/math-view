@@ -39,6 +39,7 @@ class MathView : WebView {
         }
 
     private var textColor: RGB? = null
+    private var textAlignment: TextAlignment = TextAlignment.CENTER
 
     private fun loadFormula(value: String) {
         val data = BASE_URL + encode(if (isDarkMode()) "\\color{white}{$value}" else value)
@@ -62,6 +63,7 @@ class MathView : WebView {
         pageLoaded = false
         loadFromMathJax = false
         textColor = if (isDarkMode()) RGB.WHITE else RGB.BLACK
+        textAlignment = TextAlignment.CENTER
 
         this.settings.javaScriptEnabled = true
         this.settings.useWideViewPort = true
@@ -97,6 +99,11 @@ class MathView : WebView {
     <!DOCTYPE html>
     <html>
     <head>
+    <script>
+     MathJax = {
+        chtml: { displayAlign: '${textAlignment.name.lowercase()}' }
+    };
+    </script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script type="text/javascript" id="MathJax-script" async
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
@@ -114,9 +121,9 @@ class MathView : WebView {
     fun setTextColor(@ColorRes colorInt: Int) {
         val nothing: Int? =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                mContext?.getColor(colorInt);
+                mContext?.getColor(colorInt)
             } else {
-                mContext?.resources?.getColor(colorInt);
+                mContext?.resources?.getColor(colorInt)
             }
         if (nothing == null) return
         val hexColor = String.format("#%06X", (0xFFFFFF and nothing))
@@ -135,12 +142,26 @@ class MathView : WebView {
         textColor = rgb
     }
 
+    /**
+     * Set text alignment
+     * @param textAlignment text alignment
+     */
+    fun setTextAlignment(textAlignment: TextAlignment) {
+        this.textAlignment = textAlignment
+    }
+
     data class RGB(val r: Int, val g: Int, val b: Int) {
         companion object {
-            val WHITE = RGB(255,255,255)
-            val BLACK = RGB(0,0,0)
+            val WHITE = RGB(255, 255, 255)
+            val BLACK = RGB(0, 0, 0)
         }
+
         override fun toString(): String = "rgb($r, $g, $b)"
+    }
+
+
+    enum class TextAlignment {
+        LEFT, CENTER, RIGHT
     }
 
     companion object {
