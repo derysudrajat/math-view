@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         with(binding) {
             val baseText = "2a+4b\\sqrt{\\frac{4x-2^{6}}{ax^2+57}}+\\frac{3}{2}"
             mathView.formula = baseText
+            mathView.setTextAlignment(MathView.TextAlignment.RIGHT)
             mathView.setTextColor(R.color.primary)
 //            mathView.setTextColor("#76081C")
 //            mathView.setTextColor(MathView.RGB(118, 8, 28))
