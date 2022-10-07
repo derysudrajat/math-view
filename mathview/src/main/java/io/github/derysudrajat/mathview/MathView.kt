@@ -69,6 +69,7 @@ class MathView : WebView {
         this.settings.useWideViewPort = true
         this.settings.loadWithOverviewMode = true
         this.settings.domStorageEnabled = true
+        this.setOnLongClickListener { true  }
     }
 
     private fun encode(url: String?): String = Helpers.encode(url)
