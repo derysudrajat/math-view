@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MathView">
+        <attr format="string" name="formula"/>
+        <attr format="enum" name="engine">
+            <enum name="math_jax" value="0"/>
+            <enum name="math_render" value="1"/>
+        </attr>
+        <attr format="enum" name="textAlignment">
+            <enum name="right" value="0"/>
+            <enum name="left" value="1"/>
+            <enum name="center" value="2"/>
+        </attr>
+        <attr format="color" name="textColor"/>
+    </declare-styleable>
+</resources>
