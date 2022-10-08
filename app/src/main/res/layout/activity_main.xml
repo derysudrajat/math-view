@@ -49,6 +49,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        app:formula="2a+4b\\sqrt{\\frac{4x-2^{6}}{ax^2+57}}"
+        app:engine="math_jax"
+        app:textAlignment="right"
+        app:textColor="@color/primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnRender" />

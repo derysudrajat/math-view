@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.annotation.ColorRes
+import com.derysudrajat.mathview.R
 import io.github.derysudrajat.mathview.Helpers.isDarkMode
 
 
@@ -20,56 +21,94 @@ class MathView : WebView {
     private var pageLoaded = false
 
     constructor(context: Context) : super(context) {
-        init(context)
+        init(context, null)
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        init(context)
+        init(context, attrs)
     }
 
     var formula: String = ""
         set(value) {
-            loadFormula(value)
-        }
-
-    var loadFromMathJax: Boolean = false
-        set(value) {
             field = value
-            loadFormula(formula)
+            loadFormula()
         }
 
+    private var engine: String = DEFAULT_ENGINE
     private var textColor: RGB? = null
-    private var textAlignment: TextAlignment = TextAlignment.CENTER
+    private var textAlignment: String = DEFAULT_TEXT_ALIGNMENT
 
-    private fun loadFormula(value: String) {
-        val data = BASE_URL + encode(if (isDarkMode()) "\\color{white}{$value}" else value)
-        Log.d(TAG, "setFormula: $data")
-
-        val newData = if (loadFromMathJax) getDataFromMatJax(value) else getData(data)
+    private fun loadFormula() {
+        val data = when (Helpers.safeValueOf(engine, MathViewEngine.MATH_JAX)) {
+            MathViewEngine.MATH_JAX -> getDataFromMatJax(formula)
+            MathViewEngine.MATH_RENDER -> {
+                val data = BASE_URL + encode(if (isDarkMode()) "\\color{white}{$formula}" else formula)
+                getData(data)
+            }
+        }
+        Log.d(TAG, data)
         loadData(
-            newData,
+            data,
             "text/html; charset=utf-8",
             "UTF-8"
         )
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun init(context: Context) {
+    private fun init(context: Context, attrs: AttributeSet?) {
         setBackgroundColor(Color.TRANSPARENT)
         setLayerType(View.LAYER_TYPE_SOFTWARE, null)
         setInitialScale(1)
-        formula = ""
         mContext = context
-        pageLoaded = false
-        loadFromMathJax = false
-        textColor = if (isDarkMode()) RGB.WHITE else RGB.BLACK
-        textAlignment = TextAlignment.CENTER
 
-        this.settings.javaScriptEnabled = true
-        this.settings.useWideViewPort = true
-        this.settings.loadWithOverviewMode = true
-        this.settings.domStorageEnabled = true
-        this.setOnLongClickListener { true  }
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.MathView)
+        formula = if (typedArray.hasValue(R.styleable.MathView_formula)) {
+            typedArray.getString(R.styleable.MathView_formula) ?: ""
+        } else {
+            ""
+        }
+
+        textColor = if (typedArray.hasValue(R.styleable.MathView_textColor)) {
+            val hexColor = String.format("#%06X",
+                0xFFFFFF and typedArray.getColor(R.styleable.MathView_textColor, Color.BLACK))
+            val color = hexColor.removePrefix("#")
+            val r = color.substring(0, 2).toInt(16) // 16 for hex
+            val g = color.substring(2, 4).toInt(16) // 16 for hex
+            val b = color.substring(4, 6).toInt(16) // 16 for hex
+            RGB(r, g, b)
+        } else {
+            if (isDarkMode()) RGB.WHITE else RGB.BLACK
+        }
+
+        textAlignment = if (typedArray.hasValue(R.styleable.MathView_textAlignment)) {
+            when (typedArray.getString(R.styleable.MathView_textAlignment).orEmpty()) {
+                "0" -> TextAlignment.RIGHT.value
+                "1" -> TextAlignment.LEFT.value
+                else -> TextAlignment.CENTER.value
+            }
+        } else DEFAULT_TEXT_ALIGNMENT
+
+        engine = if (typedArray.hasValue(R.styleable.MathView_engine)) {
+            when (typedArray.getString(R.styleable.MathView_engine).orEmpty()) {
+                "0" -> MathViewEngine.MATH_JAX.value
+                "1" -> MathViewEngine.MATH_RENDER.value
+                else -> MathViewEngine.MATH_JAX.value
+            }
+        } else DEFAULT_ENGINE
+        typedArray.recycle()
+
+        loadFormula()
+
+        pageLoaded = false
+        this.settings.apply {
+            javaScriptEnabled = true
+            builtInZoomControls = false
+            javaScriptEnabled = true
+            useWideViewPort = true
+            loadWithOverviewMode = true
+            domStorageEnabled = true
+        }
+        this.setOnLongClickListener { true }
     }
 
     private fun encode(url: String?): String = Helpers.encode(url)
@@ -102,7 +141,7 @@ class MathView : WebView {
     <head>
     <script>
      MathJax = {
-        chtml: { displayAlign: '${textAlignment.name.lowercase()}' }
+        chtml: { displayAlign: '${textAlignment}' }
     };
     </script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -136,7 +175,9 @@ class MathView : WebView {
         val r = color.substring(0, 2).toInt(16) // 16 for hex
         val g = color.substring(2, 4).toInt(16) // 16 for hex
         val b = color.substring(4, 6).toInt(16) // 16 for hex
-        setTextColor(RGB(r, g, b)) // Webview doesn't handle colors in hex format well. it is necessary to convert to RGB
+        setTextColor(RGB(r,
+            g,
+            b)) // Webview doesn't handle colors in hex format well. it is necessary to convert to RGB
     }
 
     fun setTextColor(rgb: RGB) {
@@ -148,7 +189,15 @@ class MathView : WebView {
      * @param textAlignment text alignment
      */
     fun setTextAlignment(textAlignment: TextAlignment) {
-        this.textAlignment = textAlignment
+        this.textAlignment = textAlignment.value
+    }
+
+    /**
+     * Set engine to be used
+     * @param engine engine to be used
+     */
+    fun setMathViewEngine(engine: MathViewEngine) {
+        this.engine = engine.value
     }
 
     data class RGB(val r: Int, val g: Int, val b: Int) {
@@ -161,12 +210,21 @@ class MathView : WebView {
     }
 
 
-    enum class TextAlignment {
-        LEFT, CENTER, RIGHT
+    enum class TextAlignment(val value: String) {
+        LEFT("left"),
+        CENTER("center"),
+        RIGHT("right"),
+    }
+
+    enum class MathViewEngine(val value: String) {
+        MATH_JAX("math_jax"),
+        MATH_RENDER("math_render"),
     }
 
     companion object {
         private val TAG = MathView::class.java.simpleName
         private const val BASE_URL = "https://render.githubusercontent.com/render/math?math="
+        private val DEFAULT_ENGINE = MathViewEngine.MATH_JAX.value
+        private val DEFAULT_TEXT_ALIGNMENT = TextAlignment.CENTER.value
     }
 }

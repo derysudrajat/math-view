@@ -1,7 +1,6 @@
 package io.github.derysudrajat.mathsample
 
 import android.annotation.SuppressLint
-import android.graphics.Color.rgb
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import io.github.derysudrajat.mathsample.databinding.ActivityMainBinding
@@ -19,16 +18,23 @@ class MainActivity : AppCompatActivity() {
 
         with(binding) {
             val baseText = "2a+4b\\sqrt{\\frac{4x-2^{6}}{ax^2+57}}+\\frac{3}{2}"
-            mathView.formula = baseText
-            mathView.setTextAlignment(MathView.TextAlignment.RIGHT)
-            mathView.setTextColor(R.color.primary)
-//            mathView.setTextColor("#76081C")
-//            mathView.setTextColor(MathView.RGB(118, 8, 28))
-//            mathView.setTextColor(MathView.RGB.WHITE)
+            switchButton.isChecked = true
+//            mathView.apply {
+//                setTextAlignment(MathView.TextAlignment.CENTER)
+//                setTextColor(R.color.primary)
+//                mathView.setTextColor("#76081C")
+//                mathView.setTextColor(MathView.RGB(118, 8, 28))
+//                mathView.setTextColor(MathView.RGB.WHITE)
+//                formula = baseText
+//            }
             edtInputMath.setText(baseText)
             btnRender.setOnClickListener {
                 val text = edtInputMath.text.toString()
-                mathView.loadFromMathJax = binding.switchButton.isChecked
+                if(binding.switchButton.isChecked){
+                    mathView.setMathViewEngine(MathView.MathViewEngine.MATH_JAX)
+                }else{
+                    mathView.setMathViewEngine(MathView.MathViewEngine.MATH_RENDER)
+                }
                 if (text.isNotBlank()) mathView.formula = text
             }
         }
